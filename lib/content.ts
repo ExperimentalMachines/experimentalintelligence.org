@@ -3,7 +3,7 @@ export const site = {
   wordmark: ["Experimental", "Intelligence"] as const,
   url: "https://experimentalintelligence.org",
   description:
-    "Experimental Intelligence builds small models from scratch, labels its own data, and publishes the weights, code and training logs so every claim can be rerun.",
+    "Small models trained from scratch, with published weights, code and training logs.",
   email: "alpha@experimentalmachines.org",
   github: "https://github.com/alpharomercoma",
 };
@@ -21,7 +21,7 @@ export const run = {
   gpu: "one H100",
   hours: "13.7 hours",
   code: "https://github.com/alpharomercoma/training-methodologies",
-  note: "The learning rate is held at its peak through pretraining and only decays in midtraining, which is what makes midtraining a stage rather than a second run. Post-training moves behaviour more than benchmarks at this size, and the table says so.",
+  note: "The learning rate holds at its peak through pretraining and decays in midtraining, which is what separates midtraining from a second pretraining run. At this size, post-training changes behaviour more than benchmark scores.",
 };
 
 export const model = {

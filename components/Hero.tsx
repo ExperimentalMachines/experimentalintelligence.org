@@ -1,27 +1,15 @@
 import RunChart from "@/components/RunChart";
 import { evals } from "@/lib/run";
-import { run, site } from "@/lib/content";
+import { run } from "@/lib/content";
 
 export default function Hero() {
   return (
     <section id="top" className="scroll-mt-14">
-      <div className="mx-auto max-w-6xl px-6 pt-16 sm:pt-24">
-        <h1 className="wide max-w-4xl text-[2.6rem] font-bold leading-[0.95] tracking-tight sm:text-7xl md:text-8xl">
-          Experimental models, trained end to end in the open.
+      <div id="run" className="mx-auto max-w-6xl scroll-mt-14 px-6 pb-16 pt-14 sm:pt-20">
+        <h1 className="wide max-w-4xl text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
+          {`Training run for a ${run.params}-parameter model on ${run.gpu}, ${run.hours}.`}
         </h1>
-        <p className="mt-6 max-w-2xl text-lg leading-8 text-carbon-soft">
-          {site.description}
-        </p>
-      </div>
-      <div id="run" className="mx-auto max-w-6xl scroll-mt-14 px-6 pb-16 pt-14">
-        <h2 className="wide text-3xl font-bold tracking-tight sm:text-4xl">
-          {`${run.params} parameters. Five stages. 13.7\u00a0hours.`}
-        </h2>
-        <p className="mt-3 max-w-2xl text-lg leading-7 text-carbon-soft">
-          One small language model, taken through pretraining, midtraining,
-          SFT, DPO and GRPO on a single H100. The whole run, unedited.
-        </p>
-        <div className="mt-8">
+        <div className="mt-10">
           <RunChart />
         </div>
         <div className="mt-12 grid gap-10 md:grid-cols-[1fr_22rem] md:gap-16">
