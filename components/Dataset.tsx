@@ -21,7 +21,7 @@ export default function Dataset() {
               Download on Kaggle
             </a>
           </div>
-          <dl className="grid grid-cols-2 gap-px self-start bg-rule sm:grid-cols-4">
+          <dl className="grid grid-cols-2 gap-px self-start bg-rule sm:grid-cols-5">
             {dataset.facts.map(([k, v]) => (
               <div key={k} className="bg-lab p-4">
                 <dd className="wide text-2xl font-bold tabular-nums">{v}</dd>

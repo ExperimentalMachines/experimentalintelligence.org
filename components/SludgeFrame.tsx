@@ -5,7 +5,7 @@ export default function SludgeFrame() {
     <svg
       viewBox="0 0 360 560"
       role="img"
-      aria-label="A split-screen short-form video: a person talking in the top half, hypnotic gameplay in the bottom half, with a transcript, labeled sludge."
+      aria-label="A split-screen short-form video: a person talking in the top half, hypnotic gameplay in the bottom half, with its audio transcript, labeled sludge."
       className="h-auto w-full max-w-[18rem]"
     >
       <rect x="0.5" y="0.5" width="359" height="559" fill="#ffffff" stroke="#0e1217" />
@@ -32,8 +32,8 @@ export default function SludgeFrame() {
         />
       ))}
       <rect x="20" y="236" width="320" height="32" fill="#ffffff" />
-      <text x="30" y="258" fontSize="15" fill="#0e1217">
-        “…and that is the story of how he lost…”
+      <text x="30" y="258" fontSize="15" fill="#5b6470">
+        audio transcript, from Whisper
       </text>
       <text x="30" y="40" fontSize="14" fill="#5b6470">
         talking clip

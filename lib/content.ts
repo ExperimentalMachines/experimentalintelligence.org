@@ -13,7 +13,7 @@ export const sibling = {
   url: "https://experimentalmachines.org",
 };
 
-export type Artifact = { label: string; href: string };
+type Artifact = { label: string; href: string };
 
 export const run = {
   params: "151M",
@@ -54,11 +54,12 @@ export const model = {
 export const dataset = {
   name: "Sludge dataset",
   summary:
-    "2,000 TikTok and YouTube clips labeled sludge or not, with transcripts. The training and test data behind Visual-Qwen.",
+    "2,000 TikTok and YouTube clips labeled sludge or not, plus a 262-clip live out-of-distribution evaluation set. The training and test data behind Visual-Qwen.",
   facts: [
     ["Clips", "2,000"],
     ["Classes", "2"],
     ["Test clips", "300"],
+    ["Live OOD clips", "262"],
     ["Size", "33 GB"],
   ] as [string, string][],
   href: "https://www.kaggle.com/datasets/jobisaacong/tiktok-sludge-dataset-500",

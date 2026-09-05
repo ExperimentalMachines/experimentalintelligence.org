@@ -1,7 +1,7 @@
 // Downsampled from the real metrics.jsonl of the first full-scale run
 // (main_150m, one H100 80GB SXM, 2026-08-14 to 2026-08-15). Values unedited.
 
-export type Stage = {
+type Stage = {
   name: string;
   hours: number;
   metric: string;
