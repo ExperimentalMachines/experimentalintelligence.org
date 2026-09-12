@@ -1,8 +1,9 @@
 import { site } from "@/lib/content";
 
 const links = [
-  { href: "#run", label: "Training" },
+  { href: "#study", label: "Study 001" },
   { href: "#model", label: "Model" },
+  { href: "#run", label: "Training" },
   { href: "#dataset", label: "Dataset" },
   { href: "#contact", label: "Contact" },
 ];

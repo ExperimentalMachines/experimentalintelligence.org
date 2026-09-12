@@ -29,9 +29,11 @@ export default function Footer() {
           >
             GitHub
           </a>
-          <a href={`mailto:${site.email}`} className="hover:text-carbon">
-            {site.email}
-          </a>
+          {site.emails.map((e) => (
+            <a key={e} href={`mailto:${e}`} className="hover:text-carbon">
+              {e}
+            </a>
+          ))}
           <span>&copy; {new Date().getFullYear()}</span>
         </div>
       </div>

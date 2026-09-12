@@ -1,10 +1,15 @@
+// One list, two readers. `email` stays the single primary address for anything
+// that can only take one; `emails` is what the page actually renders.
+const emails = ["alpha@experimentalmachines.org", "arjhinety@proton.me"] as const;
+
 export const site = {
   name: "Experimental Intelligence",
   wordmark: ["Experimental", "Intelligence"] as const,
   url: "https://experimentalintelligence.org",
   description:
-    "Small models trained from scratch, with published weights, code and training logs.",
-  email: "alpha@experimentalmachines.org",
+    "Small models trained from scratch and post-trained in the open, with published weights, code, training logs and the results that did not go our way.",
+  email: emails[0],
+  emails,
   github: "https://github.com/ExperimentalMachines",
 };
 

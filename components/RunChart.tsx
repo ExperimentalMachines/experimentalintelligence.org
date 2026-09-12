@@ -26,7 +26,7 @@ export default function RunChart() {
   const lrMax = 6e-4;
 
   return (
-    <figure>
+    <figure className="run-figure">
       <div className="overflow-x-auto">
       <svg
         viewBox={`0 0 ${W} ${H}`}
@@ -47,8 +47,12 @@ export default function RunChart() {
                 .join(" ")
             : null;
           return (
-            <g key={s.name}>
+            // pathLength={1} normalises the curve so the drawing animation in
+            // globals.css can use stroke-dasharray: 1 without knowing how long
+            // any individual path actually is.
+            <g key={s.name} className="run-g">
               <rect
+                className="run-band"
                 x={x}
                 y={TOP}
                 width={w}
@@ -56,19 +60,37 @@ export default function RunChart() {
                 fill={i % 2 ? "#ffffff" : "#eceef2"}
               />
               {lr && (
-                <path d={lr} fill="none" stroke="#d5202f" strokeWidth={1.5} strokeDasharray="4 4" />
+                // Stays dashed: the caption identifies it as the dashed red
+                // line, so it fades in rather than being drawn — a draw needs
+                // stroke-dasharray for itself and would erase the pattern.
+                <path
+                  className="run-lr"
+                  d={lr}
+                  fill="none"
+                  stroke="#d5202f"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 4"
+                />
               )}
-              <path d={path} fill="none" stroke="#0e1217" strokeWidth={2} strokeLinejoin="round" />
-              <text x={x + 10} y={TOP - 16} fontSize={20} fontWeight={700} fill="#0e1217">
+              <path
+                className="run-path"
+                d={path}
+                pathLength={1}
+                fill="none"
+                stroke="#0e1217"
+                strokeWidth={2}
+                strokeLinejoin="round"
+              />
+              <text className="run-stage" x={x + 10} y={TOP - 16} fontSize={20} fontWeight={700} fill="#0e1217">
                 {s.name}
               </text>
-              <text x={x + 10} y={H - 30} fontSize={14} fill="#5b6470">
+              <text className="run-meta" x={x + 10} y={H - 30} fontSize={14} fill="#5b6470">
                 {s.hours} h
               </text>
-              <text x={x + 10} y={H - 10} fontSize={14} fill="#5b6470">
+              <text className="run-meta" x={x + 10} y={H - 10} fontSize={14} fill="#5b6470">
                 {s.metric}
               </text>
-              <text x={x + w - 10} y={TOP + 20} fontSize={14} textAnchor="end" fill="#0e1217">
+              <text className="run-value" x={x + w - 10} y={TOP + 20} fontSize={14} textAnchor="end" fill="#0e1217">
                 {last[1].toFixed(2)}
               </text>
             </g>

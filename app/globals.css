@@ -42,3 +42,130 @@ body {
 .wide {
   font-stretch: 110%;
 }
+
+/* ── Training-run motion ───────────────────────────────────────────────
+   The curves draw themselves and the numbers land as you scroll into the
+   figure.
+
+   What this deliberately does NOT do is count the numbers up from zero. The
+   only pure-CSS way to render an animating number is a registered @property
+   feeding a counter(), and in a browser without @property support that
+   counter renders 0 — a real measurement displaying as a wrong measurement.
+   Every value here stays in the DOM as text and is animated by presentation
+   only, so what is painted is always what was measured.
+
+   Same two rules as elsewhere: reveals that start invisible live inside
+   @supports, and the reduced-motion block lands every element on its end
+   state rather than its start.
+   ──────────────────────────────────────────────────────────────────── */
+
+@keyframes ei-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes ei-rise {
+  from { opacity: 0; transform: translateY(0.5em); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ei-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@supports (animation-timeline: view()) {
+  /* One named timeline per figure, declared on an HTML ancestor and read by
+     the SVG descendants. Attaching view() to each SVG node individually would
+     depend on per-element box resolution inside the SVG. */
+  .run-figure { view-timeline-name: --run; }
+  .run-table-wrap { view-timeline-name: --runtable; }
+
+  .run-band {
+    animation: ei-fade linear both;
+    animation-timeline: --run;
+    animation-range: entry 0% entry 20%;
+  }
+
+  /* pathLength="1" is set on the metric paths, so dasharray 1 is the whole
+     curve no matter how long it actually is.
+
+     The learning-rate line is excluded on purpose. It carries a 4 4 dash that
+     the figure caption names, and a draw animation needs stroke-dasharray for
+     itself, so drawing it would erase the pattern the caption describes. It
+     fades in on the same schedule instead. */
+  .run-path {
+    stroke-dasharray: 1;
+    animation: ei-draw linear both;
+    animation-timeline: --run;
+  }
+  .run-lr {
+    animation: ei-fade linear both;
+    animation-timeline: --run;
+  }
+
+  .run-stage,
+  .run-value,
+  .run-meta {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: ei-rise ease-out both;
+    animation-timeline: --run;
+  }
+
+  /* Five bands, left to right, spread across the whole entry phase so the run
+     replays in the order it happened rather than flashing past in the first
+     fifth of it. Every offset stays inside `entry`, which is bounded by the
+     figure's own height and therefore always reached — a `cover` end can sit
+     beyond the scroll a page has left to give. */
+  .run-g:nth-child(1) .run-path { animation-range: entry 8% entry 55%; }
+  .run-g:nth-child(2) .run-path { animation-range: entry 16% entry 63%; }
+  .run-g:nth-child(3) .run-path { animation-range: entry 24% entry 71%; }
+  .run-g:nth-child(4) .run-path { animation-range: entry 32% entry 79%; }
+  .run-g:nth-child(5) .run-path { animation-range: entry 40% entry 87%; }
+
+  .run-g:nth-child(1) .run-lr { animation-range: entry 8% entry 40%; }
+  .run-g:nth-child(2) .run-lr { animation-range: entry 16% entry 48%; }
+  .run-g:nth-child(3) .run-lr { animation-range: entry 24% entry 56%; }
+
+  .run-g:nth-child(1) .run-stage, .run-g:nth-child(1) .run-meta { animation-range: entry 4% entry 22%; }
+  .run-g:nth-child(2) .run-stage, .run-g:nth-child(2) .run-meta { animation-range: entry 10% entry 28%; }
+  .run-g:nth-child(3) .run-stage, .run-g:nth-child(3) .run-meta { animation-range: entry 16% entry 34%; }
+  .run-g:nth-child(4) .run-stage, .run-g:nth-child(4) .run-meta { animation-range: entry 22% entry 40%; }
+  .run-g:nth-child(5) .run-stage, .run-g:nth-child(5) .run-meta { animation-range: entry 28% entry 46%; }
+
+  /* The end-of-stage value lands only once its own curve has finished drawing. */
+  .run-g:nth-child(1) .run-value { animation-range: entry 55% entry 68%; }
+  .run-g:nth-child(2) .run-value { animation-range: entry 63% entry 76%; }
+  .run-g:nth-child(3) .run-value { animation-range: entry 71% entry 84%; }
+  .run-g:nth-child(4) .run-value { animation-range: entry 79% entry 92%; }
+  .run-g:nth-child(5) .run-value { animation-range: entry 87% entry 100%; }
+
+  /* Benchmark table: each row's numbers land as the row comes into view. */
+  .run-row > * {
+    animation: ei-rise ease-out both;
+    animation-timeline: --runtable;
+  }
+  .run-row:nth-child(1) > * { animation-range: entry 5% entry 45%; }
+  .run-row:nth-child(2) > * { animation-range: entry 14% entry 54%; }
+  .run-row:nth-child(3) > * { animation-range: entry 23% entry 63%; }
+  .run-row:nth-child(4) > * { animation-range: entry 32% entry 72%; }
+  .run-row:nth-child(5) > * { animation-range: entry 41% entry 81%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .run-band,
+  .run-path,
+  .run-stage,
+  .run-value,
+  .run-meta,
+  .run-row > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+  /* Only the metric curves carry the drawing dasharray; the learning-rate
+     line keeps its own 4 4 pattern. */
+  .run-path {
+    stroke-dasharray: none !important;
+  }
+}

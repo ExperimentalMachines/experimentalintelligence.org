@@ -8,12 +8,18 @@ export default function People() {
           <h2 className="wide text-4xl font-bold tracking-tight sm:text-5xl">
             Working on something similar?
           </h2>
-          <a
-            href={`mailto:${site.email}`}
-            className="mt-5 inline-block text-lg text-signal underline underline-offset-4 hover:text-signal-deep"
-          >
-            {site.email}
-          </a>
+          <ul className="mt-5 space-y-2">
+            {site.emails.map((e) => (
+              <li key={e}>
+                <a
+                  href={`mailto:${e}`}
+                  className="text-lg text-signal underline underline-offset-4 hover:text-signal-deep"
+                >
+                  {e}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
         <ul className="self-end text-sm">
           {people.map((p) => (
