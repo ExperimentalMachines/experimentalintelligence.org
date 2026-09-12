@@ -84,11 +84,13 @@ export const people = [
   {
     name: "Alpha Romer Coma",
     role: "Founder",
-    href: "https://www.linkedin.com/in/alpharomercoma/",
+    linkedin: "https://www.linkedin.com/in/alpharomercoma/",
+    github: "https://github.com/alpharomercoma",
   },
   {
     name: "Arjhine Ty",
-    role: "Founding Member",
-    href: "https://www.linkedin.com/in/arrochi/",
+    role: "Co-Founder",
+    linkedin: "https://www.linkedin.com/in/arrochi/",
+    github: "https://github.com/arjhinety",
   },
 ];
