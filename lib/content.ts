@@ -5,7 +5,7 @@ export const site = {
   description:
     "Small models trained from scratch, with published weights, code and training logs.",
   email: "alpha@experimentalmachines.org",
-  github: "https://github.com/alpharomercoma",
+  github: "https://github.com/ExperimentalMachines",
 };
 
 export const sibling = {
