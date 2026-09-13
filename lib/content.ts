@@ -1,6 +1,6 @@
 // One list, two readers. `email` stays the single primary address for anything
 // that can only take one; `emails` is what the page actually renders.
-const emails = ["alpha@experimentalmachines.org", "arjhinety@proton.me"] as const;
+const emails = ["alpha@experimentalmachines.org", "arjhine@experimentalmachines.org"] as const;
 
 export const site = {
   name: "Experimental Intelligence",
