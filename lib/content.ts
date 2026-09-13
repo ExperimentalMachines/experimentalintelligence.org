@@ -95,7 +95,7 @@ export const people = [
   {
     name: "Arjhine Ty",
     role: "Co-Founder",
-    linkedin: "https://www.linkedin.com/in/arrochi/",
+    linkedin: "https://www.linkedin.com/in/arjhinety/",
     github: "https://github.com/arjhinety",
   },
 ];

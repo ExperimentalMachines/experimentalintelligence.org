@@ -12,18 +12,21 @@
 export const study = {
   id: "Study 001",
   model: "Qwen3.5-2B",
-  site: "https://opengrad-site.vercel.app",
+  site: "https://opengrad.arjhinety.com/studies/001",
   repo: "https://github.com/arjhinety/OpenGrad",
   audit:
-    "https://github.com/arjhinety/OpenGrad/blob/master/reports/FINAL_CAMPAIGN_AUDIT.md",
+    "https://github.com/arjhinety/OpenGrad/blob/study-001/reports/FINAL_CAMPAIGN_AUDIT.md",
   weights:
-    "https://huggingface.co/arrochi112/OpenGrad-Qwen3.5-2B-M1-DPO-CanonicalV2-Final-v2",
+    "https://huggingface.co/arjhinety/OpenGrad-Qwen3.5-2B-M1-DPO-CanonicalV2-Final-v2",
 };
 
-// The metric the campaign optimised. Confirmatory partition, n=1,277.
+// The metric the campaign optimised. Confirmatory partition, n=1,277, for every
+// endpoint: the base model's full 3,650-example score (0.6191, over-call 0.6425)
+// is a different population and must not be paired with the M0 / M1-v2 rows.
+// Almost all of the gain came with SFT (sft); DPO added +0.0078, within noise.
 // Deltas are derived, never stored beside the endpoints they come from — a
 // hand-maintained difference is free to drift away from the pair it describes.
-const measured = { from: 0.6191, to: 0.7548, overCallFrom: 0.6425, overCallTo: 0.1529 };
+const measured = { from: 0.6264, sft: 0.747, to: 0.7548, overCallFrom: 0.6238, overCallTo: 0.1529 };
 export const toolPolicy = { ...measured, delta: measured.to - measured.from };
 
 // The same checkpoint, measured on real IFEval, GSM8K and MMLU-Pro. One engine
@@ -33,7 +36,7 @@ export const ladder = [
   {
     stage: "Base",
     note: "Qwen3.5-2B, no SFT, no DPO",
-    callF1: 0.6191,
+    callF1: 0.6264,
     gsmZero: 0.674,
     gsmZeroRefusal: 0.0,
     gsmFew: 0.704,
@@ -90,14 +93,18 @@ export const gate = {
   perExampleRecords: 48840,
   gpuRuns: 13,
   cost: 11.39,
+  continuationCost: 8.9,
+  priorRunCost: 2.49,
   byteIdenticalDpo: 0.8196,
 };
 
 // Association, not demonstrated cause. The count comes from a heuristic regex
 // whose precision has not yet been measured, which is the first gate on the
-// follow-up experiment.
+// follow-up experiment. Counted on the published Canonical-v2 corpus M0 trained
+// on (results/benchmarks/h200/capability_v1/sft_refusal_supervision_audit_canonical_v2.json);
+// the earlier 21,749 of 217,903 read the wrong corpus and is withdrawn.
 export const corpus = {
-  records: 217903,
-  refusalTargets: 21749,
+  records: 173237,
+  refusalTargets: 18114,
   allLabelledAnswer: true,
 };

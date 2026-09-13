@@ -21,7 +21,7 @@ const panels: Panel[] = [
     lead: {
       value: `+${toolPolicy.delta.toFixed(4)}`,
       caption: "call F1 on tool use",
-      detail: `${toolPolicy.from.toFixed(4)} → ${toolPolicy.to.toFixed(4)}, and over-calling fell from ${Math.round(toolPolicy.overCallFrom * 100)}% to ${Math.round(toolPolicy.overCallTo * 100)}%`,
+      detail: `${toolPolicy.from.toFixed(4)} → ${toolPolicy.to.toFixed(4)} on held-out tool-use prompts, almost all of it from SFT (${toolPolicy.sft.toFixed(4)}), and over-calling fell from ${Math.round(toolPolicy.overCallFrom * 100)}% to ${Math.round(toolPolicy.overCallTo * 100)}%`,
     },
     turn: {
       word: "then",

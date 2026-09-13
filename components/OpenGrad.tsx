@@ -15,9 +15,9 @@ export default function OpenGrad() {
           answering questions.
         </h2>
         <p className="mt-5 max-w-2xl text-xl leading-8">
-          A checkpoint passed a pre-registered promotion gate on tool use, and
-          was promoted. It was also materially worse than the model it started
-          from — and the gate could not see it.
+          A checkpoint was promoted on tool use, under a gate revised after its
+          SFT parent had been evaluated. It was also materially worse than the
+          model it started from, and the gate could not see it.
         </p>
 
         <div className="mt-12">
@@ -75,10 +75,13 @@ export default function OpenGrad() {
           <div>
             <p className="leading-7 text-carbon-soft">
               The win was real, and it is the leftmost column. Everything else
-              moved the wrong way. Preference optimisation is not the culprit —{" "}
+              moved the wrong way. In this lineage the regression first appears
+              at supervised fine-tuning, and DPO on top changed little:{" "}
               {pct(gate.byteIdenticalDpo, 0)} of its GSM8K outputs are
-              byte-identical to the checkpoint before it. Every regression here
-              first appears one step earlier, at supervised fine-tuning.
+              byte-identical to the checkpoint before it. But DPO applied directly
+              to the base model, with no SFT, also refuses 70.7% of the same
+              questions, so the regression goes with tool-policy post-training on
+              this data, not with SFT alone.
             </p>
             <a
               href={study.site}
@@ -151,8 +154,8 @@ export default function OpenGrad() {
             <h3 className="font-medium">The likeliest cause, unproven</h3>
             <p className="mt-3 leading-7 text-carbon-soft">
               {corpus.refusalTargets.toLocaleString()} of{" "}
-              {corpus.records.toLocaleString()} training records teach a refusal
-              as the correct answer, every one labelled ANSWER. That is an
+              {corpus.records.toLocaleString()} records in the corpus it trained on
+              have a refusal as the target, every one labelled ANSWER. That is an
               association. We have not shown it is the cause, and the regex that
               counts it has not had its precision measured yet.
             </p>
@@ -160,10 +163,12 @@ export default function OpenGrad() {
           <div>
             <h3 className="font-medium">What it cost to find</h3>
             <p className="mt-3 leading-7 text-carbon-soft">
-              ${gate.cost.toFixed(2)} across {gate.gpuRuns} GPU runs. Every
-              number above recomputes from{" "}
-              {gate.perExampleRecords.toLocaleString()} per-example records
-              without a GPU, including the runs we later invalidated and kept.
+              ${gate.cost.toFixed(2)} of H200 time: $
+              {gate.continuationCost.toFixed(2)} across {gate.gpuRuns} runs, plus a
+              ${gate.priorRunCost.toFixed(2)} earlier run. The capability numbers
+              recompute from {gate.perExampleRecords.toLocaleString()} per-example
+              records without a GPU, including the runs we later invalidated and
+              kept.
             </p>
             <a
               href={study.audit}
