@@ -1,67 +1,72 @@
 import CapabilityChart from "@/components/CapabilityChart";
+import SectionMarker from "@/components/SectionMarker";
 import { corpus, gate, ladder, regime, study } from "@/lib/opengrad";
 
 const pct = (v: number, digits = 1) => `${(v * 100).toFixed(digits)}%`;
 
 export default function OpenGrad() {
   return (
-    <section id="study" className="scroll-mt-14 border-t border-rule">
-      <div className="mx-auto max-w-6xl px-6 py-14 sm:py-20">
-        <p className="text-sm text-carbon-soft">
-          OpenGrad · {study.id} · {study.model}
-        </p>
-        <h2 className="wide mt-3 max-w-4xl text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
+    <section id="study" className="scroll-mt-14 border-t border-rule bg-lab">
+      <div className="mx-auto max-w-6xl px-6 py-16 sm:py-24">
+        <SectionMarker n="01" label={`OpenGrad · ${study.id} · ${study.model}`} />
+
+        <h2 className="display-sm reveal mt-6 max-w-4xl">
           We improved the metric we were optimising. Then the model stopped
           answering questions.
         </h2>
-        <p className="mt-5 max-w-2xl text-xl leading-8">
+        <p className="reveal mt-6 max-w-2xl text-xl leading-8">
           A checkpoint was promoted on tool use, under a gate revised after its
           SFT parent had been evaluated. It was also materially worse than the
           model it started from, and the gate could not see it.
         </p>
 
-        <div className="mt-12">
+        {/* The chart is the only figure in the page that carries the finding,
+            so it gets the same plate treatment as the training curves: a white
+            card on the grey, which also stops the two figures from competing
+            with the section they sit in. */}
+        <div className="reveal mt-14 border border-rule bg-plate p-5 sm:p-7">
           <CapabilityChart />
         </div>
 
         {/* The ladder. Both columns for the same three checkpoints, so the
             trade is legible in one place rather than argued in prose. */}
-        <div className="mt-16 grid gap-10 md:grid-cols-[1fr_20rem] md:gap-16">
+        <div className="mt-20 grid gap-10 md:grid-cols-[1fr_20rem] md:gap-16">
+          <div className="reveal overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <caption className="sr-only">
               Tool-policy score and general capability for each checkpoint.
             </caption>
             <thead className="text-left text-carbon-soft">
-              <tr className="border-b border-rule">
-                <th className="py-2 pr-3 font-normal">Checkpoint</th>
-                <th className="py-2 pr-3 text-right font-normal">call F1</th>
-                <th className="py-2 pr-3 text-right font-normal">IFEval</th>
-                <th className="py-2 pr-3 text-right font-normal">MMLU-Pro</th>
-                <th className="py-2 pr-3 text-right font-normal">GSM8K 8-shot</th>
-                <th className="py-2 text-right font-normal">refuses 0-shot</th>
+              <tr className="border-b border-carbon">
+                <th className="py-2.5 pr-3 font-normal">Checkpoint</th>
+                <th className="py-2.5 pr-3 text-right font-normal">call F1</th>
+                <th className="py-2.5 pr-3 text-right font-normal">IFEval</th>
+                <th className="py-2.5 pr-3 text-right font-normal">MMLU-Pro</th>
+                <th className="py-2.5 pr-3 text-right font-normal">GSM8K 8-shot</th>
+                <th className="py-2.5 text-right font-normal">refuses 0-shot</th>
               </tr>
             </thead>
             <tbody>
               {ladder.map((s) => (
                 <tr key={s.stage} className="border-b border-rule">
-                  <td className="py-2.5 pr-3">
+                  <td className="py-3 pr-3">
                     <span className="font-medium">{s.stage}</span>
                     <span className="block text-carbon-soft">{s.note}</span>
                   </td>
-                  <td className="py-2.5 pr-3 text-right tabular-nums">
+                  <td className="py-3 pr-3 text-right tabular-nums">
                     {s.callF1.toFixed(4)}
                   </td>
-                  <td className="py-2.5 pr-3 text-right tabular-nums">
+                  <td className="py-3 pr-3 text-right tabular-nums">
                     {pct(s.ifeval)}
                   </td>
-                  <td className="py-2.5 pr-3 text-right tabular-nums">
+                  <td className="py-3 pr-3 text-right tabular-nums">
                     {pct(s.mmlu)}
                   </td>
-                  <td className="py-2.5 pr-3 text-right tabular-nums">
+                  <td className="py-3 pr-3 text-right tabular-nums">
                     {pct(s.gsmFew)}
                   </td>
                   <td
-                    className={`py-2.5 text-right tabular-nums ${
+                    className={`py-3 text-right tabular-nums ${
                       s.gsmZeroRefusal > 0 ? "font-medium text-signal" : ""
                     }`}
                   >
@@ -71,8 +76,9 @@ export default function OpenGrad() {
               ))}
             </tbody>
           </table>
+          </div>
 
-          <div>
+          <div className="reveal">
             <p className="leading-7 text-carbon-soft">
               The win was real, and it is the leftmost column. Everything else
               moved the wrong way. In this lineage the regression first appears
@@ -87,7 +93,7 @@ export default function OpenGrad() {
               href={study.site}
               target="_blank"
               rel="noreferrer"
-              className="mt-4 inline-block font-medium text-signal underline underline-offset-4 hover:text-signal-deep"
+              className="mt-5 inline-block font-medium text-signal underline underline-offset-4 hover:text-signal-deep"
             >
               Read {study.id}
             </a>
@@ -96,12 +102,12 @@ export default function OpenGrad() {
 
         {/* The regime contrast. This is the single measurement that stops the
             finding from collapsing into "it just refuses" or "it just forgot". */}
-        <div className="mt-16 border-t border-carbon pt-10">
+        <div className="mt-20 border-t border-carbon pt-12">
           <div className="grid gap-6 md:grid-cols-[minmax(0,24rem)_1fr] md:gap-16">
-            <h3 className="wide text-2xl font-bold tracking-tight">
+            <h3 className="display-sm reveal text-2xl sm:text-3xl">
               Refusal and capability are two different failures.
             </h3>
-            <p className="max-w-2xl leading-7 text-carbon-soft">
+            <p className="reveal max-w-2xl leading-7 text-carbon-soft">
               The same {regime.n.toLocaleString()} questions, twice. Asked bare,
               the promoted checkpoint refuses every one. Put eight worked
               examples in front of the identical question and it refuses none —
@@ -111,22 +117,22 @@ export default function OpenGrad() {
             </p>
           </div>
 
-          <dl className="mt-8 grid grid-cols-2 gap-px bg-rule sm:grid-cols-4">
+          <dl className="reveal mt-10 grid grid-cols-2 gap-px bg-rule sm:grid-cols-4">
             {[
               { k: "asked bare", v: pct(regime.zeroShotRefusal, 0), s: "refused", alarm: true },
               { k: "with 8 examples", v: pct(regime.fewShotRefusal, 0), s: "refused" },
               { k: "with 8 examples", v: pct(regime.fewShotSolved), s: "solved" },
               { k: "base, asked bare", v: pct(regime.baseZeroShotSolved), s: "solved" },
             ].map((c, i) => (
-              <div key={i} className="bg-lab p-4">
+              <div key={i} className="bg-lab p-5">
                 <dd
-                  className={`wide text-3xl font-bold tabular-nums ${
+                  className={`wide text-4xl font-bold tabular-nums ${
                     c.alarm ? "text-signal" : ""
                   }`}
                 >
                   {c.v}
                 </dd>
-                <dt className="mt-1 text-sm text-carbon-soft">
+                <dt className="mt-2 text-sm text-carbon-soft">
                   {c.s}
                   <span className="block">{c.k}</span>
                 </dt>
@@ -136,8 +142,8 @@ export default function OpenGrad() {
         </div>
 
         {/* Why it escaped, and what we will not claim from it. */}
-        <div className="mt-16 grid gap-10 border-t border-rule pt-10 md:grid-cols-3 md:gap-12">
-          <div>
+        <div className="mt-20 grid gap-10 border-t border-rule pt-12 md:grid-cols-3 md:gap-12">
+          <div className="reveal">
             <h3 className="font-medium">Why the gate missed it</h3>
             <p className="mt-3 leading-7 text-carbon-soft">
               The held-out set is {gate.heldOut.toLocaleString()} examples of
@@ -150,7 +156,7 @@ export default function OpenGrad() {
               to answer.
             </p>
           </div>
-          <div>
+          <div className="reveal">
             <h3 className="font-medium">The likeliest cause, unproven</h3>
             <p className="mt-3 leading-7 text-carbon-soft">
               {corpus.refusalTargets.toLocaleString()} of{" "}
@@ -160,7 +166,7 @@ export default function OpenGrad() {
               counts it has not had its precision measured yet.
             </p>
           </div>
-          <div>
+          <div className="reveal">
             <h3 className="font-medium">What it cost to find</h3>
             <p className="mt-3 leading-7 text-carbon-soft">
               ${gate.cost.toFixed(2)} of H200 time: $
@@ -174,7 +180,7 @@ export default function OpenGrad() {
               href={study.audit}
               target="_blank"
               rel="noreferrer"
-              className="mt-3 inline-block font-medium text-signal underline underline-offset-4 hover:text-signal-deep"
+              className="mt-4 inline-block font-medium text-signal underline underline-offset-4 hover:text-signal-deep"
             >
               Audit, including what it retracted
             </a>

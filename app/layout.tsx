@@ -29,8 +29,11 @@ export const metadata: Metadata = {
   },
 };
 
+// The page opens on the dark stage and the nav is dark for its whole length,
+// so the browser chrome is told to match the bar it sits above rather than the
+// light paper underneath it.
 export const viewport: Viewport = {
-  themeColor: "#f3f4f6",
+  themeColor: "#080b10",
 };
 
 export default function RootLayout({

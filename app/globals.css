@@ -1,13 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  --color-lab: #f3f4f6;
+  /* The palette is one warm-free grey ramp plus a single red. Nothing else
+     is added for decoration: every additional hue would compete with the red
+     that marks a finding, and the red is the only colour on the page that
+     means something. */
+  --color-lab: #f2f3f5;
   --color-plate: #ffffff;
+  --color-shade: #e6e9ee;
+  --color-ink: #080b10;
+  --color-ink-soft: #99a2b0;
+  --color-ink-rule: #232936;
   --color-carbon: #0e1217;
-  --color-carbon-soft: #5b6470;
-  --color-rule: #d8dce3;
+  --color-carbon-soft: #59626f;
+  --color-rule: #dcdfe5;
   --color-signal: #d5202f;
   --color-signal-deep: #a8151f;
+  --color-signal-soft: #ff5f6c;
   --font-sans: var(--font-instrument), ui-sans-serif, system-ui, Helvetica,
     Arial, sans-serif;
 }
@@ -39,8 +48,138 @@ body {
   outline-offset: 2px;
 }
 
+/* ── Type ───────────────────────────────────────────────────────────────
+   Display sizes are fluid so a section heading is never half the width of
+   the column it sits in on a large screen, and never cramped on a small one.
+
+   The family ships a width axis of 75% to 100% and nothing wider, so the
+   headlines are set condensed against the body rather than expanded: that is
+   the one direction the axis actually goes. `.wide` therefore resolves to the
+   family's maximum rather than to a stretch past it, which is what the
+   declaration previously asked for and silently had clamped.
+   ──────────────────────────────────────────────────────────────────── */
+
+.display {
+  font-size: clamp(2.75rem, 1.6rem + 5.4vw, 6.25rem);
+  line-height: 0.94;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+  font-stretch: 88%;
+}
+
+.display-sm {
+  font-size: clamp(2rem, 1.35rem + 2.9vw, 3.75rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  font-stretch: 90%;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
 .wide {
-  font-stretch: 110%;
+  font-stretch: 100%;
+}
+
+/* ── The dark stage ─────────────────────────────────────────────────────
+   Faint blueprint grid and one red bloom, so the opening of the page has a
+   surface instead of being a white sheet with text on it. Painted with
+   gradients only: no image request, nothing to load, and it survives a
+   static export unchanged.
+   ──────────────────────────────────────────────────────────────────── */
+
+.stage {
+  background-color: var(--color-ink);
+  background-image:
+    radial-gradient(
+      115% 80% at 88% -12%,
+      rgba(213, 32, 47, 0.24),
+      transparent 58%
+    ),
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: auto, 72px 72px, 72px 72px;
+  background-position: 0 0, -1px -1px, -1px -1px;
+}
+
+/* ── Motion ─────────────────────────────────────────────────────────────
+   Three pure-CSS effects, all of them presentation only.
+
+   1. A scroll progress rail, driven by scroll(root).
+   2. Section reveals, driven by view() per element.
+   3. The training-run figure, further down this file.
+
+   Rules held throughout: anything that starts invisible lives inside an
+   @supports guard, so a browser without scroll-driven animation support
+   paints the finished state rather than a blank one; and the reduced-motion
+   block lands every element on its end state rather than its start. No
+   number is ever animated, because a counter() that renders 0 in an
+   unsupported browser is a measurement displayed as a wrong measurement.
+   ──────────────────────────────────────────────────────────────────── */
+
+@keyframes ei-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes ei-in {
+  from { opacity: 0; transform: translateY(1.5rem); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ei-in-left {
+  from { opacity: 0; transform: translateX(-1.5rem); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ei-grow {
+  from { opacity: 0; transform: scaleX(0); }
+  to { opacity: 1; transform: none; }
+}
+
+/* The rail is invisible until a browser proves it can drive one, so a failed
+   @supports leaves no stray red line pinned to the top of the page. */
+.progress-rail {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 60;
+  background: var(--color-signal);
+  transform-origin: 0 50%;
+  pointer-events: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .progress-rail {
+    display: block;
+    animation: ei-progress linear both;
+    animation-timeline: scroll(root block);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: ei-in ease-out both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 42%;
+  }
+  .reveal-left {
+    animation: ei-in-left ease-out both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 42%;
+  }
+  /* A rule that draws itself across the column as the section arrives. */
+  .reveal-rule {
+    transform-origin: 0 50%;
+    animation: ei-grow ease-out both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 30%;
+  }
 }
 
 /* ── Training-run motion ───────────────────────────────────────────────
@@ -53,10 +192,6 @@ body {
    counter renders 0 — a real measurement displaying as a wrong measurement.
    Every value here stays in the DOM as text and is animated by presentation
    only, so what is painted is always what was measured.
-
-   Same two rules as elsewhere: reveals that start invisible live inside
-   @supports, and the reduced-motion block lands every element on its end
-   state rather than its start.
    ──────────────────────────────────────────────────────────────────── */
 
 @keyframes ei-draw {
@@ -152,6 +287,10 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-left,
+  .reveal-rule,
+  .progress-rail,
   .run-band,
   .run-path,
   .run-stage,
@@ -162,6 +301,11 @@ body {
     opacity: 1 !important;
     transform: none !important;
     stroke-dashoffset: 0 !important;
+  }
+  /* The rail has no meaning without motion, and a full-width red line across
+     the top of a still page reads as a border. Take it away entirely. */
+  .progress-rail {
+    display: none !important;
   }
   /* Only the metric curves carry the drawing dasharray; the learning-rate
      line keeps its own 4 4 pattern. */
