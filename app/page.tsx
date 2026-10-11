@@ -1,26 +1,25 @@
-import Dataset from "@/components/Dataset";
 import Footer from "@/components/Footer";
+import FromScratch from "@/components/FromScratch";
+import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import Model from "@/components/Model";
-import Nav from "@/components/Nav";
 import OpenGrad from "@/components/OpenGrad";
-import People from "@/components/People";
-import TrainingRun from "@/components/TrainingRun";
+import Taglish from "@/components/Taglish";
+import Team from "@/components/Team";
+import ToolChoice from "@/components/ToolChoice";
 
-// The hero states both headline results and nothing else. The two sections
-// that follow give each of them its own space, in the order the hero
-// introduced them, before the page returns to the work underneath.
+// The hero names the lab and shows two results; each project then gets its
+// own section, in the order the project strip lists them.
 export default function Home() {
   return (
     <>
-      <Nav />
-      <main>
+      <Header />
+      <main id="main">
         <Hero />
         <OpenGrad />
-        <Model />
-        <TrainingRun />
-        <Dataset />
-        <People />
+        <ToolChoice />
+        <FromScratch />
+        <Taglish />
+        <Team />
       </main>
       <Footer />
     </>

@@ -1,167 +1,154 @@
-import { model } from "@/lib/content";
-import { study, toolPolicy, regime, gate, corpus } from "@/lib/opengrad";
+import { BarRows } from "@/components/Bars";
+import { projects, run } from "@/lib/content";
+import { bare, toolPolicy } from "@/lib/opengrad";
 
-// Two results, one structure each: a headline number, a second number that
-// complicates or reinforces it, and a way in. The panels are deliberately
-// symmetrical — same type scale, same rhythm — so neither research track
-// reads as the main event and the other as a footnote.
-//
-// The surface under them is the dark stage defined in globals.css. The whole
-// point of the opening is contrast: a red bloom and a blueprint grid behind
-// oversized tabular numerals, so the first screen states the results instead
-// of laying them out like a memo.
-type Panel = {
-  eyebrow: string;
-  subject: string;
-  lead: { value: string; caption: string; detail: string };
-  turn: { word: string; value: string; caption: string; detail: string };
-  links: { label: string; href: string }[];
-  alarm?: boolean;
+type Measure = {
+  name: string;
+  n: string;
+  max: number;
+  before: [string, number, string];
+  after: [string, number, string];
 };
 
-const panels: Panel[] = [
-  {
-    eyebrow: `OpenGrad · ${study.id}`,
-    subject: study.model,
-    lead: {
-      value: `+${toolPolicy.delta.toFixed(4)}`,
-      caption: "call F1 on tool use",
-      detail: `${toolPolicy.from.toFixed(4)} → ${toolPolicy.to.toFixed(4)} on held-out tool-use prompts, almost all of it from SFT (${toolPolicy.sft.toFixed(4)}), and over-calling fell from ${Math.round(toolPolicy.overCallFrom * 100)}% to ${Math.round(toolPolicy.overCallTo * 100)}%`,
-    },
-    turn: {
-      word: "then",
-      value: `${Math.round(regime.zeroShotRefusal * 100)}%`,
-      caption: "of bare arithmetic questions refused",
-      detail: `All ${regime.n.toLocaleString()} of them. The base model refused none.`,
-    },
-    links: [
-      { label: `Read ${study.id}`, href: study.site },
-      { label: "Audit", href: study.audit },
-    ],
-    alarm: true,
-  },
-  {
-    eyebrow: "Visual-Qwen",
-    subject: "Qwen3-4B + LoRA",
-    lead: {
-      value: "99.0%",
-      caption: "sludge told from ordinary short-form video",
-      detail:
-        "On held-out clips, from a 2M-parameter projector and LoRA adapters trained on one H200.",
-    },
-    turn: {
-      word: "and",
-      value: "+10.0pp",
-      caption: "of that comes from the audio",
-      detail: "Vision alone reaches 89.0%. The Whisper transcript adds ten points.",
-    },
-    links: [
-      { label: "Weights", href: model.artifacts[1].href },
-      { label: "Code", href: model.artifacts[0].href },
-    ],
-  },
-];
-
-// The receipt for the first screen: what it took, and what it takes to check
-// the work rather than believe it. Every figure is read from the same audited
-// source the section below renders, so the band cannot drift from the claim.
-const receipt = [
-  { v: gate.perExampleRecords.toLocaleString(), k: "per-example records" },
-  { v: `$${gate.cost.toFixed(2)}`, k: `across ${gate.gpuRuns} H200 runs` },
-  { v: gate.answerExamples.toString(), k: "answering prompts in the gate" },
-  { v: `${(corpus.refusalTargets / corpus.records * 100).toFixed(1)}%`, k: "of the corpus is a refusal" },
-];
-
-function Panel({ p }: { p: Panel }) {
+// One result: two measurements, each a before/after pair on its own scale and
+// with its own denominator, so unrelated metrics never share an axis.
+function Result({ project, title, measures }: { project: string; title: string; measures: Measure[] }) {
   return (
-    <div className="flex flex-col">
-      <div className="flex items-baseline justify-between gap-4 border-b border-ink-rule pb-3">
-        <h2 className="eyebrow text-white">{p.eyebrow}</h2>
-        <span className="text-sm text-ink-soft">{p.subject}</span>
-      </div>
-
-      <p className="wide mt-8 text-6xl font-bold leading-none tracking-tight tabular-nums sm:text-7xl">
-        {p.lead.value}
-      </p>
-      <p className="mt-4 text-lg leading-7 text-white">{p.lead.caption}</p>
-      <p className="mt-2 max-w-md leading-7 text-ink-soft">{p.lead.detail}</p>
-
-      <p className="mt-9 flex items-center gap-3 text-sm text-ink-soft">
-        <span className="h-px w-8 bg-signal" aria-hidden="true" />
-        {p.turn.word}
-      </p>
-
-      <p
-        className={`wide mt-3 text-6xl font-bold leading-none tracking-tight tabular-nums sm:text-7xl ${
-          p.alarm ? "text-signal-soft" : "text-white"
-        }`}
-      >
-        {p.turn.value}
-      </p>
-      <p className="mt-4 text-lg leading-7 text-white">{p.turn.caption}</p>
-      <p className="mt-2 max-w-md leading-7 text-ink-soft">{p.turn.detail}</p>
-
-      <ul className="mt-auto flex flex-wrap gap-3 pt-9 text-sm">
-        {p.links.map((l) => (
-          <li key={l.href}>
-            <a
-              href={l.href}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-block border border-ink-rule px-4 py-2 font-medium text-white transition-colors hover:border-signal hover:bg-signal"
-            >
-              {l.label}
-            </a>
-          </li>
+    <figure className="flex flex-col rounded-[1.5rem] bg-white p-5 text-ink sm:p-6">
+      <p className="text-xs font-medium text-violet-deep">{project}</p>
+      <figcaption className="display mt-2 text-lg leading-snug">{title}</figcaption>
+      <div className="mt-5 space-y-5">
+        {measures.map((m) => (
+          <div key={m.name}>
+            <p className="text-sm font-medium">{m.name}</p>
+            <p className="mb-2.5 text-xs text-ink-soft">{m.n}</p>
+            <BarRows
+              max={m.max}
+              labelWidth="5.25rem"
+              valueWidth="4rem"
+              rows={[
+                { label: m.before[0], value: m.before[1], shown: m.before[2], muted: true },
+                { label: m.after[0], value: m.after[1], shown: m.after[2], strong: true },
+              ]}
+            />
+          </div>
         ))}
-      </ul>
-    </div>
+      </div>
+    </figure>
   );
 }
 
 export default function Hero() {
   return (
-    <section
-      id="top"
-      className="stage scroll-mt-14 overflow-hidden border-b-2 border-signal text-white"
-    >
-      <div className="mx-auto max-w-6xl px-6 pb-16 pt-14 sm:pt-20">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-b border-ink-rule pb-4 text-ink-soft">
-          <p className="eyebrow">Research log · Results and retractions</p>
-          <p className="eyebrow">Weights, code and logs published</p>
-        </div>
+    <>
+      <section id="top" className="on-violet overflow-hidden bg-violet text-white">
+        <div className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 sm:pb-20 sm:pt-10">
+          <p
+            aria-hidden
+            className="display whitespace-nowrap text-[calc((100vw-40px)/5.3)] font-semibold leading-[0.9] tracking-[-0.055em] sm:text-[min(calc((100vw-64px)/10.2),120px)]"
+          >
+            {/* Sized so the wordmark spans the content width: two lines on phones, one above. */}
+            <span className="block sm:inline">Experimental</span> <span className="block sm:inline">Intelligence</span>
+          </p>
 
-        <h1 className="display reveal mt-10 max-w-5xl text-white">
-          Two results we can hand you the evidence for.
-        </h1>
-        <p className="reveal mt-6 max-w-2xl text-xl leading-8 text-ink-soft sm:text-2xl sm:leading-9">
-          One is a model that works. The other is a model we improved, and
-          broke, and only found out because we went looking.
-        </p>
-
-        <div className="mt-14 grid gap-14 md:grid-cols-2 md:gap-16">
-          {panels.map((p) => (
-            <Panel key={p.eyebrow} p={p} />
-          ))}
-        </div>
-      </div>
-
-      {/* The receipt band. The only place on the first screen where the
-          numbers are not a result but a cost. Each cell rules itself off at
-          the top so the band keeps its meter-panel read at one, two and four
-          columns alike. */}
-      <div className="border-t border-ink-rule">
-        <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-x-8 gap-y-7 px-6 py-10 sm:grid-cols-4">
-          {receipt.map((r) => (
-            <div key={r.k} className="border-t border-ink-rule pt-4">
-              <dd className="wide text-3xl font-bold tabular-nums text-white">
-                {r.v}
-              </dd>
-              <dt className="mt-2 text-sm leading-5 text-ink-soft">{r.k}</dt>
+          <div className="mt-12 grid gap-12 lg:mt-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-16">
+            <div className="lg:order-2">
+              <h1 className="display text-balance text-4xl font-medium leading-[1.05] tracking-[-0.03em] sm:text-5xl">
+                Small models, measured in the open.
+              </h1>
+              <p className="mt-6 max-w-lg text-lg leading-8 text-white/90">
+                We train and post-train small open models and publish what each step changes, including what gets worse.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <a
+                  href="#projects"
+                  className="rounded-full bg-white px-6 py-3 text-base font-medium text-violet-deep hover:bg-white/90"
+                >
+                  See the research
+                </a>
+                <a
+                  href="#contact"
+                  className="rounded-full border border-white/40 px-6 py-3 text-base font-medium text-white hover:border-white"
+                >
+                  Contact
+                </a>
+              </div>
             </div>
-          ))}
-        </dl>
-      </div>
-    </section>
+
+            <div className="lg:order-1">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Result
+                  project="OpenGrad · Qwen3.5-2B"
+                  title="Tool-call F1 rose. Bare maths questions went unanswered."
+                  measures={[
+                    {
+                      name: "Tool-call F1",
+                      n: "1,277 held-out tool-use prompts",
+                      max: 1,
+                      before: ["Base", toolPolicy.from, toolPolicy.from.toFixed(2)],
+                      after: ["Post-trained", toolPolicy.to, toolPolicy.to.toFixed(2)],
+                    },
+                    {
+                      name: "GSM8K solved",
+                      n: `${bare.n.toLocaleString("en-US")} questions, asked without worked examples`,
+                      max: 100,
+                      before: ["Base", bare.baseSolved, `${bare.baseSolved}%`],
+                      after: ["Post-trained", bare.promotedSolved, `${bare.promotedSolved.toFixed(0)}%`],
+                    },
+                  ]}
+                />
+                <Result
+                  project="From scratch · 151M"
+                  title="GRPO taught the answer format, not the maths."
+                  measures={[
+                    {
+                      name: "GSM8K answer format",
+                      n: "200 questions, after SFT and after GRPO, with DPO between",
+                      max: 100,
+                      before: ["After SFT", run.grpo.formatFrom, `${run.grpo.formatFrom}%`],
+                      after: ["After GRPO", run.grpo.formatTo, `${run.grpo.formatTo}%`],
+                    },
+                    {
+                      name: "GSM8K solved",
+                      n: "The same 200 questions",
+                      max: 100,
+                      before: ["After SFT", run.grpo.solvedFrom / 2, `${run.grpo.solvedFrom} of 200`],
+                      after: ["After GRPO", run.grpo.solvedTo / 2, `${run.grpo.solvedTo} of 200`],
+                    },
+                  ]}
+                />
+              </div>
+              <p className="mt-4 max-w-xl text-sm leading-6 text-white/85">
+                In both, the number the training aimed at rose and the one beside it did not follow.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="projects" aria-label="Projects" className="scroll-mt-28 lg:scroll-mt-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <ul className="grid gap-x-8 gap-y-8 py-12 sm:grid-cols-2 sm:py-14 lg:grid-cols-4">
+            {projects.map((p) => (
+              <li key={p.id}>
+                <a href={`#${p.id}`} className="group block border-t-2 border-violet pt-4">
+                  <span className="flex items-center justify-between gap-3">
+                    <span className="display text-xl group-hover:text-violet-deep">{p.name}</span>
+                    <span
+                      className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs text-ink-soft ${
+                        p.id === "tool-choice" ? "border-dashed border-ink/30" : "border-rule"
+                      }`}
+                    >
+                      {p.status}
+                    </span>
+                  </span>
+                  <span className="mt-2 block text-sm leading-6 text-ink-soft">{p.line}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    </>
   );
 }

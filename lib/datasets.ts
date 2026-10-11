@@ -12,8 +12,6 @@
 const LICENSE_HREF = {
   "CC-BY-4.0": "https://creativecommons.org/licenses/by/4.0/",
   "Apache-2.0": "https://www.apache.org/licenses/LICENSE-2.0",
-  "CC-BY-NC-4.0": "https://creativecommons.org/licenses/by-nc/4.0/",
-  "CC-BY-NC-SA-4.0": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
 } as const;
 
 export type LicenseId = keyof typeof LICENSE_HREF;
@@ -49,8 +47,7 @@ export const canonicalSources: UpstreamSource[] = [
     trainable: 97112,
     refusals: 14066,
     role: "Real multi-turn tool conversations — the bulk of the corpus.",
-    caveat:
-      "The revision recorded in the release is a hash of the local input file, not a Hub commit.",
+    caveat: "The revision recorded in the release is a hash of the local input file, not a Hub commit.",
   },
   {
     repo: "Salesforce/xlam-function-calling-60k",
@@ -73,8 +70,7 @@ export const canonicalSources: UpstreamSource[] = [
     trainable: 2259,
     refusals: 10,
     role: "Complex schemas, parallel calls, and negative examples.",
-    caveat:
-      "The revision recorded in the release is a hash of the local input file, not a Hub commit.",
+    caveat: "The revision recorded in the release is a hash of the local input file, not a Hub commit.",
   },
   {
     repo: "nvidia/When2Call",
@@ -88,37 +84,12 @@ export const canonicalSources: UpstreamSource[] = [
   },
 ];
 
-// Registered in the build configuration and deliberately not in this release.
-// Kept on the page because "what we left out, and why" is the same class of
-// fact as "what we put in" — and because two of these were in v1.
-export const excludedSources = [
-  {
-    repo: "PKU-Baichuan-MLSystemLab/BUTTON",
-    license: "CC-BY-4.0" as LicenseId,
-    reason:
-      "The upstream repository is access-gated and returned 401. Nothing was fetched and nothing was approximated, so it is simply absent rather than substituted. It contributed 7,941 rows to v1.",
-  },
-  {
-    repo: "zhangkangning/LoopTool-23k",
-    license: "Apache-2.0" as LicenseId,
-    reason:
-      "The upstream source could not be located. It contributed 20,827 rows to v1.",
-  },
-  {
-    repo: "Salesforce/APIGen-MT-5k",
-    license: "CC-BY-NC-4.0" as LicenseId,
-    reason:
-      "Excluded on contamination with the τ-bench and τ²-bench families, not on its licence — its planned share of the mixture was zero from the start.",
-  },
-];
-
 export const canonical = {
   name: "OpenGrad ToolPolicy Canonical v2",
   short: "Canonical v2",
   href: "https://huggingface.co/datasets/arjhinety/OpenGrad-ToolPolicy-Canonical-v2",
   schema: "tool_use_ir_v1",
-  fingerprint:
-    "8ced403b996e563d6e279aee7fdb346fc829fe5ff6af9daf8ef47c0a4007e161",
+  fingerprint: "8ced403b996e563d6e279aee7fdb346fc829fe5ff6af9daf8ef47c0a4007e161",
   fingerprintNote: "SHA-256 of the release manifest, which you can re-hash.",
   summary:
     "One schema over four public function-calling datasets: 173,237 records, each mapped to a single tool-use intermediate representation and each tagged with the supervision contract it can carry. This is the corpus the promoted Study 001 checkpoint was supervised on, and the corpus the refusal finding was measured in.",
@@ -143,25 +114,4 @@ export const canonical = {
     "redistribution_status",
     "modification_status",
   ],
-};
-
-export const sludge = {
-  name: "Sludge / non-sludge clips",
-  href: "https://www.kaggle.com/datasets/jobisaacong/tiktok-sludge-dataset-500",
-  license: "CC-BY-NC-SA-4.0" as LicenseId,
-  summary:
-    "2,000 TikTok and YouTube clips labelled sludge or not, plus a 262-clip live out-of-distribution evaluation set scraped after the corpus was frozen. The training and test data behind Visual-Qwen.",
-  provenance:
-    "Collected from TikTok and YouTube, then label-audited: 231 video-level labels were flipped against a model teacher and cross-judge, and the original labels are kept alongside the corrections so the disagreement stays inspectable. Non-commercial, share-alike, because the underlying videos are other people's.",
-  facts: [
-    ["Clips", "2,000"],
-    ["Classes", "2"],
-    ["Test clips", "300"],
-    ["Live OOD clips", "262"],
-    ["Size", "~34 GB"],
-  ] as [string, string][],
-  platforms: [
-    ["TikTok", "1,680"],
-    ["YouTube", "320"],
-  ] as [string, string][],
 };

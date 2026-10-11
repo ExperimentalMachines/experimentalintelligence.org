@@ -1,19 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Sans } from "next/font/google";
+import { Inter, Inter_Tight } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/content";
 
-const instrument = Instrument_Sans({
-  subsets: ["latin"],
-  axes: ["wdth"],
-  variable: "--font-instrument",
-  display: "swap",
-});
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-inter-tight", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: site.name,
   description: site.description,
+  alternates: { canonical: "/" },
   openGraph: {
     title: site.name,
     description: site.description,
@@ -29,11 +26,9 @@ export const metadata: Metadata = {
   },
 };
 
-// The page opens on the dark stage and the nav is dark for its whole length,
-// so the browser chrome is told to match the bar it sits above rather than the
-// light paper underneath it.
+// The header and hero are violet, so the browser chrome matches them.
 export const viewport: Viewport = {
-  themeColor: "#080b10",
+  themeColor: "#7b3fe4",
 };
 
 export default function RootLayout({
@@ -42,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${instrument.variable} antialiased`}>
+    <html lang="en" className={`${inter.variable} ${interTight.variable} antialiased`}>
       <body className="min-h-screen">{children}</body>
     </html>
   );

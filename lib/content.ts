@@ -1,13 +1,12 @@
 // One list, two readers. `email` stays the single primary address for anything
-// that can only take one; `emails` is what the page actually renders.
+// that can only take one; `emails` is what the page renders.
 const emails = ["alpha@experimentalmachines.org", "arjhine@experimentalmachines.org"] as const;
 
 export const site = {
   name: "Experimental Intelligence",
-  wordmark: ["Experimental", "Intelligence"] as const,
   url: "https://experimentalintelligence.org",
   description:
-    "Small models trained from scratch and post-trained in the open, with published weights, code, training logs and the results that did not go our way.",
+    "A research lab that trains and post-trains small open models and measures what each step changes, including what gets worse.",
   email: emails[0],
   emails,
   github: "https://github.com/ExperimentalMachines",
@@ -16,75 +15,116 @@ export const site = {
 export const sibling = {
   name: "Experimental Machines",
   url: "https://experimentalmachines.org",
+  openweights: "https://github.com/ExperimentalMachines/openweights",
 };
 
-type Artifact = { label: string; href: string };
+// The four projects, in the order the page tells them.
+export const projects = [
+  {
+    id: "opengrad",
+    name: "OpenGrad",
+    line: "Post-training a 2B model for tool use, and measuring the side effects",
+    status: "Study 001 published",
+  },
+  {
+    id: "tool-choice",
+    name: "Tool-choice contrast",
+    line: "A test set that holds the question fixed and changes the tools",
+    status: "In development",
+  },
+  {
+    id: "from-scratch",
+    name: "From scratch",
+    line: "A 151M model trained through five stages on one GPU",
+    status: "Run complete",
+  },
+  {
+    id: "taglish",
+    name: "Taglish sentiment",
+    line: "Sentiment for Tagalog, Taglish and English text",
+    status: "Results on GitHub",
+  },
+];
 
+// From the tool-choice-contrast README. Nothing is frozen and nothing has been
+// measured yet, so the counts are the design, not a result.
+export const toolChoice = {
+  repo: "https://github.com/ExperimentalMachines/tool-choice-contrast",
+  rubric: "https://github.com/ExperimentalMachines/tool-choice-contrast/blob/main/docs/RUBRIC.md",
+  arms: [
+    { family: "Answer directly", tools: "No tools", gold: "Answer" },
+    { family: "Answer directly", tools: "One irrelevant tool", gold: "Answer" },
+    { family: "Answer directly", tools: "Three to five irrelevant tools", gold: "Answer" },
+    { family: "Decide about a tool", tools: "The right tool, every parameter known", gold: "Call it" },
+    { family: "Decide about a tool", tools: "The right tool, a parameter missing", gold: "Ask" },
+    { family: "Decide about a tool", tools: "The right tool swapped for a wrong one", gold: "Say it can't" },
+  ],
+  items: 900,
+  stems: 300,
+};
+
+// The 151M run. Read from the run's manifest (docs/runs/2026-08-14-main_150m.md
+// in the training repository); the curves are in lib/run.ts.
 export const run = {
   params: "151M",
   tokens: "10B",
   gpu: "one H100",
-  hours: "13.7 hours",
-  code: "https://github.com/alpharomercoma/training-methodologies",
-  note: "The learning rate holds at its peak through pretraining and decays in midtraining, which is what separates midtraining from a second pretraining run. At this size, post-training changes behaviour more than benchmark scores.",
+  hours: "13.7",
+  // GSM8K (200 questions) after SFT and after GRPO, with DPO between: the share
+  // of answers in the "#### <answer>" format, and the number solved.
+  grpo: { formatFrom: 5.5, formatTo: 98.5, solvedFrom: 2, solvedTo: 3 },
 };
 
-export const model = {
-  name: "Visual-Qwen",
-  claim:
-    "Tells sludge from ordinary short-form video with 99.0% accuracy on held-out clips.",
-  how: "A frozen vision tower feeds 32 query tokens into Qwen3-4B through a 2M-parameter projector. The clip's Whisper transcript joins the same token stream. Only the projector and LoRA adapters are trained, on one H200.",
-  ablation: "Vision alone reaches 89.0%. Adding the transcript adds ten points.",
-  stack: [
-    ["EVA-ViT-G/14", "frozen", "257 × 1408"],
-    ["Q-Former", "frozen", "32 × 768"],
-    ["Linear projector", "trained", "32 × 2560"],
-    ["Whisper V3 Turbo", "transcript", "tokens"],
-    ["Qwen3-4B + LoRA", "trained", "verdict"],
-  ] as [string, string, string][],
-  artifacts: [
-    { label: "Code", href: "https://github.com/alpharomercoma/vqwen-qformer" },
-    {
-      label: "Weights",
-      href: "https://huggingface.co/alpharomercoma/vqwen-qformer-tiktok-v2",
-    },
-    {
-      label: "LLaVA-style variant",
-      href: "https://github.com/alpharomercoma/visual-qwen-gpu",
-    },
-    { label: "MicroMARC thesis", href: "https://micromarc.vercel.app" },
-  ] as Artifact[],
+// From the taglish-sentiment-analysis README, results of 2026-07-17.
+export const taglish = {
+  repo: "https://github.com/alpharomercoma/taglish-sentiment-analysis",
+  base: "XLM-RoBERTa",
+  macroF1: 0.7292,
+  baseline: 0.6322,
+  slices: [
+    { label: "Tagalog", value: 0.813 },
+    { label: "Taglish", value: 0.817 },
+    { label: "English", value: 0.7 },
+  ],
+  latency: [
+    { label: "PyTorch", value: 11.8, shown: "11.8 ms" },
+    { label: "ONNX int8", value: 5.1, shown: "5.1 ms" },
+  ],
+  size: { from: "1.1 GB", to: "287 MB" },
 };
 
-// Datasets moved to lib/datasets.ts, which carries licence terms and
-// per-source accounting. What stays here is the list of work that is not a
-// headline dataset yet.
-export const further = [
-  {
-    name: "Taglish sentiment",
-    desc: "Three-class sentiment for Tagalog, Taglish and English. Contamination-audited data, int8 ONNX for CPU.",
-    status: "published",
-    href: "https://github.com/alpharomercoma/taglish-sentiment-analysis",
-  },
-  {
-    name: "Touch-native vision-action model",
-    desc: "A foundation model for mobile games that learns continuous touch from screen recordings, then runs on the phone it plays on.",
-    status: "planned",
-    href: null,
-  },
-];
+export type Member = {
+  name: string;
+  role: string;
+  href?: string;
+  label?: string;
+};
 
-export const people = [
+// The same team as experimentalmachines.org.
+export const team: Member[] = [
   {
     name: "Alpha Romer Coma",
-    role: "Founder",
-    linkedin: "https://www.linkedin.com/in/alpharomercoma/",
-    github: "https://github.com/alpharomercoma",
+    role: "Co-Founder",
+    href: "https://www.linkedin.com/in/alpharomercoma/",
+    label: "LinkedIn",
   },
+  { name: "John Andrew Balbarosa", role: "Co-Founder" },
   {
     name: "Arjhine Ty",
     role: "Co-Founder",
-    linkedin: "https://www.linkedin.com/in/arjhinety/",
-    github: "https://github.com/arjhinety",
+    href: "https://www.linkedin.com/in/arjhinety/",
+    label: "LinkedIn",
+  },
+  {
+    name: "Xynil Jhed Lacap",
+    role: "Co-Founder",
+    href: "https://github.com/mr-jones123",
+    label: "GitHub",
+  },
+  {
+    name: "JC Diamante",
+    role: "Core Contributor",
+    href: "https://github.com/Zeraphim",
+    label: "GitHub",
   },
 ];

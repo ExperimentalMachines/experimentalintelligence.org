@@ -1,110 +1,62 @@
 // OpenGrad Study 001. Every number is transcribed from an audited artifact in
-// the OpenGrad repository and recomputes from 48,840 per-example records
-// without a GPU. Sources: results/final_campaign_verdict.json,
+// the OpenGrad repository. Sources: results/final_campaign_verdict.json,
 // results/benchmarks/h200/capability_v1/{final_campaign_audit,regression_analysis}.json,
-// reports/FINAL_CAMPAIGN_AUDIT.md.
+// reports/FINAL_CAMPAIGN_AUDIT.md, and for the quantized builds
+// manifests/quantization/ptq_phase_closure_v1.json.
 //
-// Two rules held while writing this file. Nothing is rounded in a direction
-// that flatters the result, and nothing unmeasured is filled in by
-// interpolation — M1-v1's corrected-budget MMLU-Pro run was terminated on
-// budget and stays absent rather than estimated.
+// Nothing is rounded in a direction that flatters the result, and nothing
+// unmeasured is filled in.
 
 export const study = {
   id: "Study 001",
   model: "Qwen3.5-2B",
   site: "https://opengrad.arjhinety.com/studies/001",
   repo: "https://github.com/arjhinety/OpenGrad",
-  audit:
-    "https://github.com/arjhinety/OpenGrad/blob/study-001/reports/FINAL_CAMPAIGN_AUDIT.md",
-  weights:
-    "https://huggingface.co/arjhinety/OpenGrad-Qwen3.5-2B-M1-DPO-CanonicalV2-Final-v2",
+  audit: "https://github.com/arjhinety/OpenGrad/blob/study-001/reports/FINAL_CAMPAIGN_AUDIT.md",
+  weights: "https://huggingface.co/arjhinety/OpenGrad-Qwen3.5-2B-M1-DPO-CanonicalV2-Final-v2",
+  gguf: "https://huggingface.co/arjhinety/OpenGrad-Qwen3.5-2B-M1-DPO-CanonicalV2-Final-v2-GGUF",
 };
 
-// The metric the campaign optimised. Confirmatory partition, n=1,277, for every
-// endpoint: the base model's full 3,650-example score (0.6191, over-call 0.6425)
-// is a different population and must not be paired with the M0 / M1-v2 rows.
-// Almost all of the gain came with SFT (sft); DPO added +0.0078, within noise.
-// Deltas are derived, never stored beside the endpoints they come from — a
-// hand-maintained difference is free to drift away from the pair it describes.
-const measured = { from: 0.6264, sft: 0.747, to: 0.7548, overCallFrom: 0.6238, overCallTo: 0.1529 };
-export const toolPolicy = { ...measured, delta: measured.to - measured.from };
+// Confirmatory partition, n=1,277. Base → promoted checkpoint (M1-v2).
+export const toolPolicy = { from: 0.6264, to: 0.7548, overCallFrom: 62.4, overCallTo: 15.3 };
 
-// The same checkpoint, measured on real IFEval, GSM8K and MMLU-Pro. One engine
-// configuration across all stages — vLLM 0.29.0, bfloat16, greedy, seed 0 — so
-// no difference between stages is attributable to the runtime.
-export const ladder = [
-  {
-    stage: "Base",
-    note: "Qwen3.5-2B, no SFT, no DPO",
-    callF1: 0.6264,
-    gsmZero: 0.674,
-    gsmZeroRefusal: 0.0,
-    gsmFew: 0.704,
-    ifeval: 0.6784,
-    mmlu: 0.49,
-  },
-  {
-    stage: "M0 · SFT",
-    note: "where every regression first appears",
-    callF1: 0.747,
-    gsmZero: 0.0,
-    gsmZeroRefusal: 1.0,
-    gsmFew: 0.563,
-    ifeval: 0.451,
-    mmlu: 0.37,
-  },
-  {
-    stage: "M1-v2 · DPO",
-    note: "promoted checkpoint",
-    callF1: 0.7548,
-    gsmZero: 0.0,
-    gsmZeroRefusal: 1.0,
-    gsmFew: 0.555,
-    ifeval: 0.4584,
-    mmlu: 0.37,
-  },
-] as const;
+// Bare GSM8K, 1,319 questions: solved by the base, solved and refused by the
+// promoted checkpoint.
+export const bare = { n: 1319, baseSolved: 67.4, promotedSolved: 0.0, promotedRefused: 100 };
 
-// Base → M0, in percentage points. Measured in regimes where the refusal rate
-// is approximately zero, which is what makes them capability claims rather
-// than restatements of the refusal behaviour. The drop is derived from the
-// endpoints so the figure and its bars cannot disagree.
+// Base → M0 (SFT), in percent, where the regression first appears. Measured
+// where the refusal rate is near zero, which is what makes the bottom two
+// capability results rather than restatements of the refusal behaviour.
 export const losses = (
   [
-    { name: "IFEval strict", from: 67.8, to: 45.1, refusal: "19.0%" },
+    { name: "IFEval strict", from: 67.8, to: 45.1, refusal: "19%" },
     { name: "GSM8K 8-shot", from: 70.4, to: 56.3, refusal: "0%" },
     { name: "MMLU-Pro 5-shot", from: 49.0, to: 37.0, refusal: "0%" },
   ] as const
 ).map((l) => ({ ...l, delta: l.to - l.from }));
 
-// The contrast that separates a refusal policy from a capability loss. Same
-// 1,319 questions in both arms; only the exemplars differ.
-export const regime = {
-  n: 1319,
-  zeroShotRefusal: 1.0,
-  fewShotRefusal: 0.0,
-  fewShotSolved: 0.555,
-  baseZeroShotSolved: 0.674,
-};
+// What the frozen confirmatory partition asked of the model. It held no item
+// that simply asks for an answer, so the gate could not see the refusals.
+export const heldOut = [
+  { label: "Call a tool", n: 453 },
+  { label: "Say it can't", n: 453 },
+  { label: "Ask to clarify", n: 371 },
+  { label: "Just answer", n: 0 },
+];
 
-export const gate = {
-  heldOut: 3650,
-  answerExamples: 0,
-  perExampleRecords: 48840,
-  gpuRuns: 13,
-  cost: 11.39,
-  continuationCost: 8.9,
-  priorRunCost: 2.49,
-  byteIdenticalDpo: 0.8196,
-};
+export const cost = { total: 11.39, runs: 13 };
 
-// Association, not demonstrated cause. The count comes from a heuristic regex
-// whose precision has not yet been measured, which is the first gate on the
-// follow-up experiment. Counted on the published Canonical-v2 corpus M0 trained
-// on (results/benchmarks/h200/capability_v1/sft_refusal_supervision_audit_canonical_v2.json);
-// the earlier 21,749 of 217,903 read the wrong corpus and is withdrawn.
-export const corpus = {
-  records: 173237,
-  refusalTargets: 18114,
-  allLabelledAnswer: true,
-};
+// The promoted checkpoint quantized nine ways for llama.cpp. Agreement is the
+// share of the 1,277 confirmatory decisions unchanged from the unquantized
+// GGUF; `passes` is the frozen quantization_preservation_v1 gate.
+export const ladder = [
+  { format: "Q2_K", gib: 0.9, agreement: 53.4, passes: false },
+  { format: "IQ3_M", gib: 0.99, agreement: 77.1, passes: false },
+  { format: "Q3_K_M", gib: 1.02, agreement: 77.1, passes: false },
+  { format: "IQ4_XS", gib: 1.11, agreement: 88.3, passes: false },
+  { format: "Q4_K_S", gib: 1.13, agreement: 87.9, passes: false },
+  { format: "Q4_K_M", gib: 1.19, agreement: 87.2, passes: false },
+  { format: "Q5_K_M", gib: 1.31, agreement: 95.0, passes: false },
+  { format: "Q6_K", gib: 1.45, agreement: 98.0, passes: true },
+  { format: "Q8_0", gib: 1.87, agreement: 98.7, passes: true },
+];
