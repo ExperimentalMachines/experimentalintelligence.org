@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     locale: "en_US",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: site.name,
     description: site.description,
   },
@@ -31,6 +31,18 @@ export const viewport: Viewport = {
   themeColor: "#7b3fe4",
 };
 
+// Structured data for search engines: the lab, its logo and where it publishes.
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: site.name,
+  url: site.url,
+  logo: `${site.url}/brand/ei-mark.png`,
+  description: site.description,
+  email: site.email,
+  sameAs: [site.github],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -38,7 +50,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${interTight.variable} antialiased`}>
-      <body className="min-h-screen">{children}</body>
+      <body className="min-h-screen">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

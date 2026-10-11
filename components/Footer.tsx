@@ -5,8 +5,12 @@ export default function Footer() {
     <footer className="border-t border-rule">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-12 sm:px-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="display text-xl tracking-tight">
-            Experimental <span className="font-semibold">Intelligence</span>
+          <p className="display flex items-center gap-3 text-xl tracking-tight">
+            {/* eslint-disable-next-line @next/next/no-img-element -- a static export serves committed files */}
+            <img src="/brand/ei-mark.svg" alt="" width={50} height={20} className="h-5 w-auto" />
+            <span>
+              Experimental <span className="font-semibold">Intelligence</span>
+            </span>
           </p>
           <p className="mt-2 max-w-sm text-sm leading-6 text-ink-soft">
             An independent lab that trains small models and publishes what it measures. Our sister organisation,{" "}

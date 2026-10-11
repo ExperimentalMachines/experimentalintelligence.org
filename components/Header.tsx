@@ -1,7 +1,9 @@
 import { site } from "@/lib/content";
 
 // In the hero's violet and kept that colour on scroll, as on
-// experimentalmachines.org.
+// experimentalmachines.org. Laid out like blacksmith.sh: the mark alone at the
+// far left with the section links beside it, the action on the right, and the
+// hero's giant wordmark carrying the name.
 const sections = [
   { href: "#opengrad", label: "OpenGrad" },
   { href: "#tool-choice", label: "Tool choice" },
@@ -19,9 +21,10 @@ export default function Header() {
       >
         Skip to content
       </a>
-      <nav aria-label="Main" className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6">
-        <a href="#top" className="display shrink-0 whitespace-nowrap text-[1.05rem]">
-          Experimental <span className="font-semibold">Intelligence</span>
+      <nav aria-label="Main" className="mx-auto flex h-16 max-w-7xl items-center gap-10 px-4 sm:px-6">
+        <a href="#top" className="flex shrink-0 items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element -- a static export serves committed files */}
+          <img src="/brand/ei-mark-white.svg" alt="Experimental Intelligence" width={70} height={28} className="h-7 w-auto" />
         </a>
         <div className="hidden items-center gap-8 text-[0.95rem] text-white/85 lg:flex">
           {sections.map((s) => (
@@ -35,7 +38,7 @@ export default function Header() {
         </div>
         <a
           href="#contact"
-          className="hidden shrink-0 whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-medium text-violet-deep hover:bg-white/90 min-[380px]:inline-block"
+          className="ml-auto hidden shrink-0 whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-medium text-violet-deep hover:bg-white/90 min-[380px]:inline-block"
         >
           Contact
         </a>
