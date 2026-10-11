@@ -35,17 +35,25 @@ export default function Header() {
           <a href={site.github} target="_blank" rel="noreferrer" className="hover:text-white">
             GitHub
           </a>
-          {/* The sister site, set apart from this page's sections by a rule. */}
-          <a href={sibling.url} className="border-l border-white/25 pl-6 hover:text-white xl:pl-8">
-            {sibling.name}
+        </div>
+        <div className="ml-auto flex shrink-0 items-center gap-2">
+          {/* The sister site, beside this page's own call to action. Its mark alone on narrow phones. */}
+          <a
+            href={sibling.url}
+            aria-label={sibling.name}
+            className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-white/40 px-3 py-2 text-sm font-medium text-white hover:border-white sm:px-4"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element -- a static export serves committed files */}
+            <img src="/brand/em-mark-mono-dark.svg" alt="" width={16} height={16} className="h-4 w-4" />
+            <span className="hidden sm:inline">{sibling.name}</span>
+          </a>
+          <a
+            href="#contact"
+            className="hidden shrink-0 whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-medium text-violet-deep hover:bg-white/90 min-[380px]:inline-block"
+          >
+            Contact
           </a>
         </div>
-        <a
-          href="#contact"
-          className="ml-auto hidden shrink-0 whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-medium text-violet-deep hover:bg-white/90 min-[380px]:inline-block"
-        >
-          Contact
-        </a>
       </nav>
       <nav aria-label="Sections" className="relative border-t border-white/15 lg:hidden">
         {/* A fade at the edge says the row scrolls. */}
@@ -63,9 +71,6 @@ export default function Header() {
             className="inline-flex min-h-11 shrink-0 items-center hover:text-white"
           >
             GitHub
-          </a>
-          <a href={sibling.url} className="inline-flex min-h-11 shrink-0 items-center hover:text-white">
-            {sibling.name}
           </a>
         </div>
       </nav>
