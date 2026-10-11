@@ -1,4 +1,4 @@
-import { site } from "@/lib/content";
+import { sibling, site } from "@/lib/content";
 
 // In the hero's violet and kept that colour on scroll, as on
 // experimentalmachines.org. Laid out like blacksmith.sh: the mark alone at the
@@ -21,12 +21,12 @@ export default function Header() {
       >
         Skip to content
       </a>
-      <nav aria-label="Main" className="mx-auto flex h-16 max-w-7xl items-center gap-10 px-4 sm:px-6">
+      <nav aria-label="Main" className="mx-auto flex h-16 max-w-7xl items-center gap-8 px-4 sm:px-6 xl:gap-10">
         <a href="#top" className="flex shrink-0 items-center">
           {/* eslint-disable-next-line @next/next/no-img-element -- a static export serves committed files */}
           <img src="/brand/ei-mark-white.svg" alt="Experimental Intelligence" width={70} height={28} className="h-7 w-auto" />
         </a>
-        <div className="hidden items-center gap-8 text-[0.95rem] text-white/85 lg:flex">
+        <div className="hidden items-center gap-6 whitespace-nowrap text-[0.95rem] text-white/85 lg:flex xl:gap-8">
           {sections.map((s) => (
             <a key={s.href} href={s.href} className="hover:text-white">
               {s.label}
@@ -34,6 +34,10 @@ export default function Header() {
           ))}
           <a href={site.github} target="_blank" rel="noreferrer" className="hover:text-white">
             GitHub
+          </a>
+          {/* The sister site, set apart from this page's sections by a rule. */}
+          <a href={sibling.url} className="border-l border-white/25 pl-6 hover:text-white xl:pl-8">
+            {sibling.name}
           </a>
         </div>
         <a
@@ -59,6 +63,9 @@ export default function Header() {
             className="inline-flex min-h-11 shrink-0 items-center hover:text-white"
           >
             GitHub
+          </a>
+          <a href={sibling.url} className="inline-flex min-h-11 shrink-0 items-center hover:text-white">
+            {sibling.name}
           </a>
         </div>
       </nav>
